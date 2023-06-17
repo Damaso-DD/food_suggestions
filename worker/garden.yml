@@ -1,0 +1,16 @@
+kind: Build
+description: Builds the worker that collects food suggestions and stores them in a postgres table
+type: container
+name: worker
+---
+kind: Deploy
+description: Deploys the worker that collects food suggestions and stores them in a postgres table
+type: container
+name: worker
+build: worker
+dependencies: [deploy.redis, run.create-db]
+spec:
+  env:
+    PGDATABASE: ${var.postgres-database}
+    PGUSER: ${var.postgres-username}
+    PGPASSWORD: ${var.postgres-password}

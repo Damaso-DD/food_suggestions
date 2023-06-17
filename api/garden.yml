@@ -1,0 +1,45 @@
+kind: Build
+name: api
+description: Builds the backend container for the Restaurant Food Suggestion App
+type: container
+---
+kind: Deploy
+name: api
+description: Deploys the backend service for the Restaurant Food Suggestion App
+type: container
+build: api
+dependencies: [deploy.worker]
+spec:
+  args: [python, app.py]
+  ports:
+    - name: http
+      protocol: TCP
+      containerPort: 8080
+      servicePort: 80
+  healthCheck:
+    httpGet:
+      path: /health
+      port: http
+  ingresses:
+    - path: /
+      hostname: "api.${var.base-hostname}"
+      port: http
+---
+kind: Test
+name: api-unit
+description: Unit Test for the Restaurant Food Suggestion App
+build: api
+type: container
+dependencies: [deploy.api]
+spec:
+  args: ["python", "-m", "unittest", "discover", "-s", "tests/unit_tests/"]
+---
+kind: Test
+name: api-integ
+description: Integration Test for the Restaurant Food Suggestion App
+build: api
+type: container
+dependencies: [run.db-clear, run.create-db, deploy.worker]
+spec:
+  args: ["python", "-m", "unittest", "discover", "-s", "tests/integration_tests/"]
+

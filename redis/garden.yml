@@ -1,0 +1,10 @@
+kind: Deploy
+description: Deploy the Redis service for queueing food suggestions before they are stored in the database.
+type: container
+name: redis
+spec:
+  image: redis:alpine
+  ports:
+    - name: redis
+      protocol: TCP
+      containerPort: 6379
